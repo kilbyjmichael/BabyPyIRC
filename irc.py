@@ -1,5 +1,6 @@
 import socket
 import sys
+import wikipedia
 
 class IRC:
     
@@ -20,20 +21,26 @@ class IRC:
         # self.irc.send('PRIVMSG ' + chan + ' :Test Print.\n')
         return "Connected!"
 
-    def ping_pong(self, data):
-        if data.find('PING') != -1: #If PING is Found in the Data
-            self.irc.send('PONG ' + data.split()[1] + '\n') #Send back a PONG
+
 
     def get_data(self):
         data = self.irc.recv(2040) # get me some data!
-        self.ping_pong(data)
+        
+        if data.find('PING') != -1: #If PING is Found in the Data
+            self.irc.send('PONG ' + data.split()[1] + '\n') #Send back a PONG
+            
         return data
 
     def test_data(self, data, chan):
         if "PRIVMSG" in data and chan in data and "!test" in data:
             self.send_msg(chan, "You tested me!")
         elif "PRIVMSG" in data and chan in data and "!wikipedia" in data:
-            self.send_msg(chan, "Wikipedia is awesome.")
+            command = ':'.join(data.split (':')[2:])
+            com_args = ''.join(command.replace('!wikipedia ', ''))
+            user = data.split('!')[0].replace(':', '')
+            wiki_return = str(wikipedia.summary(com_args))
+            final_send = user + " your wikipedia search: " + wiki_return
+            self.send_msg(chan, wiki_return)
 
     def cleanup(self):
         self.irc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
