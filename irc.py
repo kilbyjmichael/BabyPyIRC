@@ -21,13 +21,11 @@ class IRC:
         # self.irc.send('PRIVMSG ' + chan + ' :Test Print.\n')
         return "Connected!"
 
-
-
     def get_data(self):
         data = self.irc.recv(2040) # get me some data!
         
-        if data.find('PING') != -1: #If PING is Found in the Data
-            self.irc.send('PONG ' + data.split()[1] + '\n') #Send back a PONG
+        if "PING" in data: #If PING is Found in the Data
+            self.irc.send("PONG " + data.split()[1] + '\n') #Send back a PONG
             
         return data
 
