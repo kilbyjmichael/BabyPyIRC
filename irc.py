@@ -31,7 +31,8 @@ class IRC:
 
     def test_data(self, data, chan):
         if "PRIVMSG" in data and chan in data and "!test" in data:
-            self.send_msg(chan, "You tested me!")
+            user = data.split('!')[0].replace(':', '')
+            self.send_msg(chan, user + " tested me!")
         elif "PRIVMSG" in data and chan in data and "!wikipedia" in data:
             command = ':'.join(data.split (':')[2:])
             com_args = ''.join(command.replace('!wikipedia ', ''))
