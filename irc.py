@@ -17,17 +17,24 @@ class IRC:
         self.irc.send('NICK ' + nick + '\n')
         self.irc.send('USER Py_Bot Py_Bot Py_Bot :Py+Bot IRC\n')
         self.irc.send('JOIN ' + chan + '\n')
-        self.irc.send('PRIVMSG ' + chan + ' :Test Print.\n')
+        # self.irc.send('PRIVMSG ' + chan + ' :Test Print.\n')
         return "Connected!"
 
-    def ping_pong(data):
+    def ping_pong(self, data):
         if data.find('PING') != -1: #If PING is Found in the Data
             self.irc.send('PONG ' + data.split()[1] + '\n') #Send back a PONG
 
     def get_data(self):
         data = self.irc.recv(2040) # get me some data!
-
-        if data.find('PING') != -1: #If PING is Found in the Data
-            self.irc.send('PONG ' + data.split()[1] + '\n') #Send back a PONG
-
+        self.ping_pong(data)
         return data
+
+    def test_data(self, data, chan):
+        if "PRIVMSG" in data and chan in data and "!test" in data:
+            self.send_msg(chan, "You tested me!")
+        elif "PRIVMSG" in data and chan in data and "!wikipedia" in data:
+            self.send_msg(chan, "Wikipedia is awesome.")
+
+    def cleanup(self):
+        self.irc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.irc.shutdown(socket.SHUT_RDWR)
