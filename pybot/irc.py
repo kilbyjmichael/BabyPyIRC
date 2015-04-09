@@ -25,7 +25,7 @@ class IRC:
         data = self.irc.recv(2040) # get me some data!
         
         if "PING" in data: #If PING is Found in the Data
-            self.irc.send("PONG " + data.split()[1] + '\n') #Send back a PONG
+            self.irc.send("PONG " + data.split(':')[1] + '\n') #Send back a PONG
             
         return data
 
@@ -37,10 +37,15 @@ class IRC:
             command = ':'.join(data.split (':')[2:])
             com_args = ''.join(command.replace('!wikipedia ', ''))
             user = data.split('!')[0].replace(':', '')
-            wiki_return = str(wikipedia.summary(com_args))
+            try: wiki_return = str(wikipedia.summary(com_args))
+            except UnicodeEncodeError:
+                error = "Cant unicode"
+                return self.send_msg(chan, error)
             final_send = user + " your wikipedia search: " + wiki_return
-            self.send_msg(chan, wiki_return)
+            self.send_msg(chan, final_send)
 
     def cleanup(self):
         self.irc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.irc.shutdown(socket.SHUT_RDWR)
+        
+    #def leave!
