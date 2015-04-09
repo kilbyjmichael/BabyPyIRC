@@ -53,9 +53,15 @@ class IRC:
             command = ':'.join(data.split (':')[2:])
             com_args = ''.join(command.replace('!join ', ''))
             self.join_chan(com_args)
-        elif "sageinventor" in data and chan in data and "!quit" in data:
-            self.irc.send("QUIT :leaving bro\n")
+        elif "sageinventor" in data and "!quit" in data:
+            # self.irc.send("QUIT :leaving bro\n") dosn't work
             self.cleanup()
+        elif "PRIVMSG" in data and chan in data and "!say" in data:
+            command = ':'.join(data.split (':')[2:])
+            com_args = ''.join(command.replace('!say ', ''))
+            # no works: say_chan = ''.join(com_args.split(''))
+            # self.send_msg("#PyBotDebugChan", say_chan)
+            self.send_msg(chan, com_args)
 
     def cleanup(self):
         self.irc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
