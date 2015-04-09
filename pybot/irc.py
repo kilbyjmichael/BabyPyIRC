@@ -11,6 +11,10 @@ class IRC:
 
     def send_msg(self, chan, msg):
         self.irc.send("PRIVMSG " + chan + " :" + msg + "\n")
+        
+    def join_chan(self, chan):
+        self.irc.send('JOIN ' + chan + "\n")
+        # add to chan list, so bot funcitons on all chans
 
     def connect(self, server, port, chan, nick):
         print "Connecting to... " + server
@@ -18,7 +22,9 @@ class IRC:
         self.irc.send('NICK ' + nick + '\n')
         self.irc.send('USER Py_Bot Py_Bot Py_Bot :Py+Bot IRC\n')
         self.irc.send('JOIN ' + chan + '\n')
-        # self.irc.send('PRIVMSG ' + chan + ' :Test Print.\n')
+        
+        self.irc.send('JOIN ' + "#PyBotDebugChan" + '\n')
+        self.irc.send('PRIVMSG ' + "#PyBotDebugChan" + ' :Test Print.\n')
         return "Connected!"
 
     def get_data(self):
@@ -43,6 +49,13 @@ class IRC:
                 return self.send_msg(chan, error)
             final_send = user + " your wikipedia search: " + wiki_return
             self.send_msg(chan, final_send)
+        elif "PRIVMSG" in data and chan in data and "!join" in data:
+            command = ':'.join(data.split (':')[2:])
+            com_args = ''.join(command.replace('!join ', ''))
+            self.join_chan(com_args)
+        elif "sageinventor" in data and chan in data and "!quit" in data:
+            self.irc.send("QUIT :leaving bro\n")
+            self.cleanup()
 
     def cleanup(self):
         self.irc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
